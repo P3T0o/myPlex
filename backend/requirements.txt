@@ -4,3 +4,6 @@ asyncpg
 psycopg2-binary
 sqlalchemy
 pydantic
+alembic
+passlib
+python-jose

@@ -1,9 +1,9 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
     container_name: backend
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://user:password@db:5432/myplex_db
     ports:
       - "8000:8000"
     volumes:
@@ -25,13 +25,17 @@ services:
     image: postgres:14
     container_name: postgres
     environment:
-      POSTGRES_USER: myplex_user
-      POSTGRES_PASSWORD: myplex_password
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: myplex_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+          test: [ "CMD-SHELL", "pg_isready -U user" ]
+          interval: 5s
+          retries: 5
 
 volumes:
   postgres_data:
