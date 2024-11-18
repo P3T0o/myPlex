@@ -2,8 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from .models.reminder import Reminder
-from .models.user import User, Base
+from .models import Base, User, Reminder
 from .schemas.reminder import ReminderResponse, ReminderCreate
 from .schemas.user import UserCreate, UserResponse
 from .database import engine, get_db
