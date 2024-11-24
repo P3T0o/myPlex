@@ -34,6 +34,7 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 ###### ==============================
 
 # Endpoint pour créer un rappel
+# TODO: Finir cette methode afin d'avoir le lien entre le user connecté et le bon rappel
 @app.post("/reminders/", response_model=ReminderResponse)
 async def create_reminder(reminder: ReminderCreate, db: AsyncSession = Depends(get_db)):
     new_reminder = Reminder(name=reminder.name, description=reminder.description, notified_mail=reminder.notified_mail,
