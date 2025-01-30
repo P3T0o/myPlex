@@ -1,21 +1,19 @@
-# backend/Dockerfile
+# Set version for latest LTS version of Node.js
+FROM node:22.11.0
 
-FROM python:3.10-slim
+WORKDIR /backend
 
-# Set the working directory in the container
-WORKDIR /app
+COPY package*.json ./
 
-# Copy the requirements file
-COPY requirements.txt .
+RUN npm install -g npm@latest && npm install
 
-# Install the Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the FastAPI app code
 COPY . .
 
-# Expose the port that FastAPI will run on
-EXPOSE 8000
+# Important : This is required for hot reloading to work in Docker on Windows
+ENV CHOKIDAR_USEPOLLING=true
 
-# Command to run the FastAPI app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+EXPOSE 3333
+
+# Delete database, Run migrations, Run seed data, and start the app
+CMD npm run db:fresh && \
+npm run dev
