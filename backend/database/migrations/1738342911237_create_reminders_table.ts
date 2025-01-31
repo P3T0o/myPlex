@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.text('description').notNullable()
       table.boolean('finish').defaultTo(false)
       table.boolean('notified_mail').defaultTo(false)
-      table.timestamp('date_end').notNullable()
+      table.timestamp('date_end').nullable()
       table.integer('user_id').unsigned().references('users.id').onDelete('CASCADE')
 
       table.timestamp('created_at')

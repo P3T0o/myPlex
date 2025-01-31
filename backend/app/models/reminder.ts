@@ -15,7 +15,13 @@ export default class Reminder extends BaseModel {
   declare description: string | null
 
   @column()
-  declare remindAt: Date
+  declare finish: boolean
+
+  @column()
+  declare notified_mail: boolean
+
+  @column()
+  declare date_end: DateTime
 
   @column()
   declare userId: number
