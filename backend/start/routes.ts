@@ -15,5 +15,27 @@ router.get('/', async () => {
   }
 })
 
-router.post('/users', '#controllers/users_controller.store')
-router.get('/users', '#controllers/users_controller.index')
+router
+  .group(() => {
+    // Routes USERS
+    router
+      .group(() => {
+        router.post('/register', '#controllers/auth_controller.register')
+        router.post('/login', '#controllers/auth_controller.login')
+        router.post('/logout', '#controllers/auth_controller.logout')
+      })
+      .prefix('auth')
+    router
+      .group(() => {
+        router.post('/', '#controllers/users_controller.store') // Admin
+        router.get('/', '#controllers/users_controller.index') // Admin
+      })
+      .prefix('user')
+    // Routes REMINDERS
+    router
+      .group(() => {
+        router.post('/', '#controllers/reminders_controller.userCreateReminder')
+      })
+      .prefix('reminders')
+  })
+  .prefix('api')
