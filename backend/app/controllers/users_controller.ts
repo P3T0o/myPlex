@@ -1,15 +1,19 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
-import { CreateUserValidator } from '#validators/create_user'
+import { CreateUserValidator } from '#validators/auth'
+import { PayloadUserRegister } from '../type/users_type.js'
 
 export default class UsersController {
-  public async store({ request, response }: HttpContext) {
+  /**
+   * Création d'un user (store)
+   */
+  public async store({ request, response }: HttpContext): Promise<void> {
     try {
       // Validation des données envoyées dans la requête
-      const payload = await request.validateUsing(CreateUserValidator)
+      const payload: PayloadUserRegister = await request.validateUsing(CreateUserValidator)
 
       // Création de l'utilisateur
-      const user = await User.create(payload)
+      const user: User = await User.create(payload)
       return response.created(user)
     } catch (error) {
       // Renvoi des messages d'erreur personnalisés
@@ -20,8 +24,11 @@ export default class UsersController {
     }
   }
 
+  /**
+   * Get all user (index)
+   */
   public async index({ response }: HttpContext) {
-    const users = await User.all()
+    const users: User[] = await User.all()
     return response.ok(users)
   }
 }
