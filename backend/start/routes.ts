@@ -31,9 +31,6 @@ router
       .group(() => {
         router.post('/', '#controllers/users_controller.store') // Admin
         router.get('/', '#controllers/users_controller.index') // Admin
-        router
-          .get('/me/reminders', '#controllers/users_controller.myReminders')
-          .use(middleware.auth())
       })
       .prefix('users')
     // Routes REMINDERS
@@ -42,6 +39,7 @@ router
         router
           .post('/', '#controllers/reminders_controller.userCreateReminder')
           .use(middleware.auth())
+        router.get('/me', '#controllers/reminders_controller.myReminders').use(middleware.auth())
       })
       .prefix('reminders')
   })

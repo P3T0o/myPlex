@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Reminder from '#models/reminder'
 import Tag from '#models/tag'
 import User from '#models/user'
+import {AccessToken} from "@adonisjs/auth/access_tokens";
 
 export default class RemindersController {
   /**
@@ -33,5 +34,28 @@ export default class RemindersController {
     }
 
     return response.created(reminder)
+  }
+  /**
+   * Methode pour que l'utilisateur connecté puisse récupérer ses reminders
+   */
+  public async myReminders({ auth, response }: HttpContext) {
+    try {
+      // Récupérer l'utilisateur authentifié
+      const user: User & { currentAccessToken: AccessToken } = await auth.authenticate()
+
+      if (!user) {
+        return response.unauthorized({ message: 'Utilisateur non authentifié' })
+      }
+
+      // Récupérer les reminders du user connecté
+      const reminders: Reminder[] = await Reminder.query().where('user_id', user.id)
+
+      return response.ok(reminders)
+    } catch (error) {
+      return response.internalServerError({
+        message: 'Erreur lors de la récupération des rappels',
+        error: error.message,
+      })
+    }
   }
 }
