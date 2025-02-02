@@ -38,7 +38,7 @@ export default class RemindersController {
   /**
    * Methode pour que l'utilisateur connecté puisse récupérer ses reminders
    */
-  public async myReminders({ auth, response }: HttpContext) {
+  public async myReminders({ auth, response }: HttpContext): Promise<void> {
     try {
       // Récupérer l'utilisateur authentifié
       const user: User & { currentAccessToken: AccessToken } = await auth.authenticate()
@@ -54,6 +54,36 @@ export default class RemindersController {
     } catch (error) {
       return response.internalServerError({
         message: 'Erreur lors de la récupération des rappels',
+        error: error.message,
+      })
+    }
+  }
+
+  /**
+   * Methode pour que l'utilisateur connecté puisse récupérer un de ses reminder
+   */
+  public async showMyReminder({ auth, params, response }: HttpContext) {
+    try {
+      const user: User & { currentAccessToken: AccessToken } = await auth.authenticate()
+
+      if (!user) {
+        return response.unauthorized({ message: 'Utilisateur non authentifié' })
+      }
+
+      // Récupération du reminder avec vérification qu'il appartient bien à l'utilisateur
+      const reminder: Reminder | null = await Reminder.query()
+        .where('id', params.id)
+        .andWhere('user_id', user.id)
+        .first()
+
+      if (!reminder) {
+        return response.notFound({ message: 'Reminder introuvable ou non autorisé' })
+      }
+
+      return response.ok(reminder)
+    } catch (error) {
+      return response.internalServerError({
+        message: 'Erreur lors de la récupération du reminder',
         error: error.message,
       })
     }

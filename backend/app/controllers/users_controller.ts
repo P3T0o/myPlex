@@ -27,7 +27,7 @@ export default class UsersController {
   /**
    * Get all user (index)
    */
-  public async index({ response }: HttpContext) {
+  public async index({ response }: HttpContext): Promise<void> {
     const users: User[] = await User.all()
     return response.ok(users)
   }
