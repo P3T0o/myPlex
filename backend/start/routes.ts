@@ -41,6 +41,8 @@ router
           .use(middleware.auth())
         router.get('/me', '#controllers/reminders_controller.myReminders').use(middleware.auth())
         router.get('/:id', '#controllers/reminders_controller.showMyReminder').use(middleware.auth())
+        router.patch('/:id', '#controllers/reminders_controller.updateMyReminder').use(middleware.auth())
+        router.delete('/:id','#controllers/reminders_controller.destroyMyReminder').use(middleware.auth())
       })
       .prefix('reminders')
   })

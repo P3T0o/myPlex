@@ -2,7 +2,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Reminder from '#models/reminder'
 import Tag from '#models/tag'
 import User from '#models/user'
-import {AccessToken} from "@adonisjs/auth/access_tokens";
+import { AccessToken } from '@adonisjs/auth/access_tokens'
+import { UpdateReminderValidator } from '#validators/reminder'
+import { PayloadReminderCreate } from '../type/reminders_type.js'
 
 export default class RemindersController {
   /**
@@ -62,9 +64,9 @@ export default class RemindersController {
   /**
    * Methode pour que l'utilisateur connecté puisse récupérer un de ses reminder
    */
-  public async showMyReminder({ auth, params, response }: HttpContext) {
+  public async showMyReminder({ auth, params, response }: HttpContext): Promise<void> {
     try {
-      const user: User & { currentAccessToken: AccessToken } = await auth.authenticate()
+      const user: User = await auth.authenticate()
 
       if (!user) {
         return response.unauthorized({ message: 'Utilisateur non authentifié' })
@@ -84,6 +86,72 @@ export default class RemindersController {
     } catch (error) {
       return response.internalServerError({
         message: 'Erreur lors de la récupération du reminder',
+        error: error.message,
+      })
+    }
+  }
+  /**
+   * Met à jour un reminder appartenant à l'utilisateur connecté
+   */
+  public async updateMyReminder({ auth, params, request, response }: HttpContext): Promise<void> {
+    try {
+      const user: User = await auth.authenticate()
+
+      if (!user) {
+        return response.unauthorized({ message: 'Utilisateur non authentifié' })
+      }
+
+      // Récupération du reminder
+      const reminder: Reminder | null = await Reminder.query()
+        .where('id', params.id)
+        .andWhere('user_id', user.id)
+        .first()
+
+      if (!reminder) {
+        return response.notFound({ message: 'Reminder introuvable ou non autorisé' })
+      }
+
+      // Validation et mise à jour des données
+      const payload: PayloadReminderCreate = await request.validateUsing(UpdateReminderValidator)
+      reminder.merge(payload)
+      await reminder.save()
+
+      return response.ok(reminder)
+    } catch (error) {
+      return response.badRequest({
+        message: 'Erreur lors de la mise à jour du reminder',
+        error: error.messages || error.message,
+      })
+    }
+  }
+
+  /**
+   * Supprime un reminder appartenant à l'utilisateur connecté
+   */
+  public async destroyMyReminder({ auth, params, response }: HttpContext): Promise<void> {
+    try {
+      const user: User & { currentAccessToken: AccessToken } = await auth.authenticate()
+
+      if (!user) {
+        return response.unauthorized({ message: 'Utilisateur non authentifié' })
+      }
+
+      // Récupération du reminder
+      const reminder: Reminder | null = await Reminder.query()
+        .where('id', params.id)
+        .andWhere('user_id', user.id)
+        .first()
+
+      if (!reminder) {
+        return response.notFound({ message: 'Reminder introuvable ou non autorisé' })
+      }
+
+      await reminder.delete()
+
+      return response.ok({ message: 'Reminder supprimé avec succès' })
+    } catch (error) {
+      return response.internalServerError({
+        message: 'Erreur lors de la suppression du reminder',
         error: error.message,
       })
     }
