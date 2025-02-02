@@ -8,6 +8,7 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { middleware } from '#start/kernel'
 
 router.get('/', async () => {
   return {
@@ -17,24 +18,30 @@ router.get('/', async () => {
 
 router
   .group(() => {
-    // Routes USERS
+    // Routes AUTH
     router
       .group(() => {
         router.post('/register', '#controllers/auth_controller.register')
         router.post('/login', '#controllers/auth_controller.login')
-        router.post('/logout', '#controllers/auth_controller.logout')
+        router.post('/logout', '#controllers/auth_controller.logout').use(middleware.auth())
       })
       .prefix('auth')
+    // Routes USERS
     router
       .group(() => {
         router.post('/', '#controllers/users_controller.store') // Admin
         router.get('/', '#controllers/users_controller.index') // Admin
+        router
+          .get('/me/reminders', '#controllers/users_controller.myReminders')
+          .use(middleware.auth())
       })
-      .prefix('user')
+      .prefix('users')
     // Routes REMINDERS
     router
       .group(() => {
-        router.post('/', '#controllers/reminders_controller.userCreateReminder')
+        router
+          .post('/', '#controllers/reminders_controller.userCreateReminder')
+          .use(middleware.auth())
       })
       .prefix('reminders')
   })

@@ -4,6 +4,9 @@ import Tag from '#models/tag'
 import User from '#models/user'
 
 export default class RemindersController {
+  /**
+   * Methode pour qu'un utilisateur puisse créer un reminder avec des tags
+   */
   public async userCreateReminder({ request, response, auth }: HttpContext): Promise<void> {
     const user: User = await auth.authenticate()
     if (!user) {
