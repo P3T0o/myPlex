@@ -14,16 +14,6 @@ services:
     networks:
       - app-network
 
-  frontend:
-    build: ./frontend
-    container_name: frontend
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./frontend:/app
-    stdin_open: true
-    tty: true
-
   db:
     image: postgres:14
     container_name: postgres
