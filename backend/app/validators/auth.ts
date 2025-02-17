@@ -15,3 +15,11 @@ export const LoginValidator = vine.compile(
     password: vine.string().trim().minLength(6),
   })
 )
+
+export const UpdateUserValidator = vine.compile(
+  vine.object({
+    name: vine.string().trim().minLength(3).maxLength(255).optional(),
+    email: vine.string().email().unique({ table: 'users', column: 'email' }),
+    password: vine.string().trim().minLength(6).optional(),
+  })
+)
